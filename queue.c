@@ -15,7 +15,6 @@ struct list_head *q_new()
 {
     list_head *empty_head = malloc(sizeof(list_head));
     INIT_LIST_HEAD(empty_head);
-    empty_head->data = NULL;
     return empty_head;
 }
 
@@ -46,8 +45,6 @@ bool q_insert_head(struct list_head *head, char *s)
         head->prev = new_node;
         new_node->next = head;
         new_node->prev = new_node;
-        new_node->data = (char) malloc(sizeof(s));
-        new_node->data = *s;
         return true;
     }
 }
@@ -66,8 +63,6 @@ bool q_insert_tail(struct list_head *head, char *s)
         tail->next = new_node;
         new_node->prev = tail;
         new_node->next = new_node;
-        new_node->data = (char) malloc(sizeof(s));
-        new_node->data = *s;
         return true;
     }
 }
@@ -78,9 +73,7 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
     if (head == NULL) {
         return NULL;
     } else {
-        free(head->data);
-        head->data = (char) malloc(bufsize);
-        head->data = *sp;
+        free(head);
     }
 }
 
@@ -94,9 +87,7 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
         while (tail->next != tail) {
             tail = tail->next;
         }
-        free(tail->data);
-        tail->data = (char) malloc(bufsize);
-        tail->data = *sp;
+        free(tail);
     }
 }
 
