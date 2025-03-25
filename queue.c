@@ -13,19 +13,21 @@
 /* Create an empty queue */
 struct list_head *q_new()
 {
-    list_head *empty_head = malloc(sizeof(list_head));
-    INIT_LIST_HEAD(empty_head);
-    return empty_head;
+    struct list_head *empty_queue = malloc(sizeof(struct list_head));
+    empty_queue -> prev = empty_queue;
+    empty_queue -> next = empty_queue;
+    return empty_queue;
 }
 
 /* Free all storage used by queue */
 void q_free(struct list_head *head)
 {
-    struct list_head *next;
-    struct list_head *prev;
+    if (head == NULL) { return; }
+    struct list_head *next = head->next;
+    struct list_head *prev = head; // head of list_head, prev is itself
     while (head->next != head->prev) {
-        next = head->next;
-        prev = head->prev;
+        next = head->next->list;
+        prev = head->prev->list;
 
         next->prev = prev;
         prev->next = next;
@@ -33,18 +35,20 @@ void q_free(struct list_head *head)
         free(head);
         head = next;
     }
+    return;
 }
 
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
-    struct list_head *new_node = (struct list_head) malloc(sizeof(list_head));
-    if (head == NULL | new_node == NULL) {
+    struct element_t *new_element = (struct element_t)malloc(sizeof(struct element_t));
+    if (head == NULL | new_element == NULL) {
         return false;
     } else {
-        head->prev = new_node;
-        new_node->next = head;
-        new_node->prev = new_node;
+        head->next->list->prev = (struct list_head)new_element; // prev of first element -> new_element
+        new_element->list->next = head->next; // next of new_element -> origin first
+        new_element->list->prev = head; // prev of new_element -> list_head
+        head->next = (struct list_head)new_element;
         return true;
     }
 }
@@ -52,17 +56,17 @@ bool q_insert_head(struct list_head *head, char *s)
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
-    struct list_head *new_node = (struct list_head) malloc(sizeof(list_head));
-    if (head == NULL | new_node == NULL) {
+    struct element_t *new_element = (struct element_t)malloc(sizeof(struct element_t));
+    if (head == NULL | new_element == NULL) {
         return false;
     } else {
         struct list_head *tail = head;
         while (tail->next != tail) {
-            tail = tail->next;
+            tail = tail->next->list;
         }
-        tail->next = new_node;
-        new_node->prev = tail;
-        new_node->next = new_node;
+        tail->next = (struct list_head)new_element;
+        new_element->list->prev = tail;
+        new_element->list->next = (struct list_head)new_element;
         return true;
     }
 }
